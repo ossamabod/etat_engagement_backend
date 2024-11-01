@@ -3,6 +3,7 @@ package ma.fst.etatdengagement.Services.Impl;
 import ma.fst.etatdengagement.Adapter.EmployeeAdapter;
 import ma.fst.etatdengagement.DTO.Employee.EmployeeDto;
 import ma.fst.etatdengagement.DTO.Employee.SearchEmployeeDto;
+import ma.fst.etatdengagement.Exceptions.ResourceNotFoundException;
 import ma.fst.etatdengagement.Models.*;
 import ma.fst.etatdengagement.Repository.EmployeRepository;
 import ma.fst.etatdengagement.Repository.EtatEngagementRepository;
@@ -10,9 +11,13 @@ import ma.fst.etatdengagement.Repository.GradeRepository;
 import ma.fst.etatdengagement.Services.EmployeeService;
 import ma.fst.etatdengagement.Services.GradeService;
 import ma.fst.etatdengagement.Specification.EmployeeSpecification;
+import ma.fst.etatdengagement.tools.Constant.ErrorConstant;
 import ma.fst.etatdengagement.tools.Constant.Utils;
+import org.hibernate.Filter;
+import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -21,10 +26,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+    private final MessageSource messageSource;
+
     private final ModelMapper modelMapper;
     private final EmployeRepository employeeRepository;
     private final EtatEngagementRepository etatEngagementRepository;
@@ -33,7 +41,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeSpecification employeeSpecification;
     private final EmployeeAdapter employeeAdapter;
     @Autowired
-    public EmployeeServiceImpl(ModelMapper modelMapper, EmployeRepository employeeRepository, EtatEngagementRepository etatEngagementRepository, GradeRepository gradeRepository, EmployeeSpecification employeeSpecification, EmployeeAdapter employeeAdapter) {
+    public EmployeeServiceImpl(MessageSource messageSource, ModelMapper modelMapper, EmployeRepository employeeRepository, EtatEngagementRepository etatEngagementRepository, GradeRepository gradeRepository, EmployeeSpecification employeeSpecification, EmployeeAdapter employeeAdapter) {
+        this.messageSource = messageSource;
         this.modelMapper = modelMapper;
         this.employeeRepository = employeeRepository;
         this.etatEngagementRepository = etatEngagementRepository;
@@ -166,17 +175,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
 
-    // 4. Update an employee
-//    @Override
-//    public EmployeeDto updateEmployee(Long id, EmployeeDto employeeDto) {
-//        if (!employeeRepository.existsById(id)) {
-//            throw new IllegalArgumentException("Employee with ID " + id + " not found.");
-//        }
-//
-//        employeeDto.setEmployeeId(id);
-//        Employee updatedEmployee = fromDto(employeeDto);
-//        return toDto(employeeRepository.save(updatedEmployee));
-//    }
+    @Override
+    public EmployeeDto updateEmployee( long id,EmployeeDto employeeDto) {
+        if (!employeeRepository.existsById(id)) {
+            throw new IllegalArgumentException("Employee with ID " + employeeDto.employeeId() + " not found.");
+        }
+        Employee updatedEmployee = modelMapper.map(employeeDto,Employee.class);
+//        updatedEmployee.setEmployeeId(id);
+        return employeeAdapter.fromEmployeeToEmployeeDTO(this.createEmployee(updatedEmployee));
+    }
 
     // 5. Search employees by CIN
     @Override
@@ -191,12 +198,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     // 7. Delete an employee
     @Override
-    public boolean deleteEmployee(Long id) {
-        if (employeeRepository.existsById(id)) {
-            employeeRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public void deleteEmployee(Long id) throws ResourceNotFoundException {
+        employeeRepository.findById(id).ifPresentOrElse(employeeRepository::delete,
+                () -> {
+                    throw new ResourceNotFoundException(messageSource.getMessage(ErrorConstant.ERROR_RESOURCE_NOT_DELETED, null, Locale.FRENCH));
+                });
+
     }
 
     // Mapping methods (if not using a dedicated mapper)

@@ -1,6 +1,12 @@
 package ma.fst.etatdengagement.DTO.Employee;
 
+import ma.fst.etatdengagement.DTO.Conjoint.ConjointDto;
+import ma.fst.etatdengagement.DTO.Enfant.EnfantDto;
+import ma.fst.etatdengagement.DTO.EtatEngagement.EtatEngagementDto;
+import ma.fst.etatdengagement.DTO.Grade.GradeDto;
+
 import java.util.Date;
+import java.util.List;
 
 public record EmployeeDto( Long employeeId,String cin,
          String nom,
@@ -28,6 +34,11 @@ public record EmployeeDto( Long employeeId,String cin,
          String dp,
          String province,
          String region,
-         double Pa
+         double Pa,
+         GradeDto grade,
+         ConjointDto conjoint,
+         List<EnfantDto> enfants,
+        List<EtatEngagementDto> EtatEngagement
 ) {
+
 }

@@ -12,11 +12,10 @@ public interface EmployeeService {
     public Employee getEmployeeById(Long id);
     public Employee createEmployee(Employee employee);
     Page<EmployeeDto> searchByCriteria(SearchEmployeeDto searchEmployeeDto);
-
-
+    EmployeeDto updateEmployee(long id,EmployeeDto employeedto);
     //    public EmployeeDto updateEmployee(Long id, EmployeeDto employeeDto);
     public List<Employee> searchEmployeesByCin(String CIN);
-    public boolean deleteEmployee(Long id);
+    public void deleteEmployee(Long id);
 
 
 }

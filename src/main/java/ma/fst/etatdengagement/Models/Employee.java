@@ -52,11 +52,11 @@ public class Employee {
     @JsonManagedReference
     private Conjoint conjoint;
 
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     @JsonManagedReference // Used to manage circular reference with Enfant
     private List<Enfant> enfants;
 
-    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<EtatEngagement> EtatEngagement ;
 

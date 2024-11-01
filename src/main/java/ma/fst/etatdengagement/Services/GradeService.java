@@ -13,14 +13,13 @@ import java.util.Optional;
 public interface GradeService {
 
     boolean deleteGrade(Long id);
-    Page<Grade> getAllGrades();
-    Optional<Grade> getGradeById(Long id);
+
     List<GradeDto> searchByCriteria(SearchGradeDto searchGradeDto);
 
 
     Grade createGradeWithDetails(Grade grade);
 
-    Optional<Grade>  updateGradeWithDetails(Long id, Grade grade);
+   Optional<Grade> updateGradeWithDetails(long id,Grade grade);
 
     // Ajoutez d'autres méthodes pour gérer Retenue si nécessaire (update, delete)
 }

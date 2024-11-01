@@ -9,6 +9,8 @@ import ma.fst.etatdengagement.tools.Constant.ErrorConstant;
 import ma.fst.etatdengagement.tools.Constant.MessageConstant;
 import ma.fst.etatdengagement.Models.Employee;
 import ma.fst.etatdengagement.Response.GeneriqueResponse;
+import org.hibernate.Filter;
+import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -37,7 +39,7 @@ public class EmployeeController {
         this.modelMapper=modelMapper;
 
     }
-    @GetMapping("/getEmployee")
+    @GetMapping("/searchbycriteria")
     @ResponseBody
     public GeneriqueResponse<Page<EmployeeDto>> SearchByCriteria(SearchEmployeeDto searchEmployeeDto){
         try {
@@ -58,22 +60,29 @@ public class EmployeeController {
         }
 
     }
-    @GetMapping
-    public GeneriqueResponse<Employee> getEmployee(@RequestBody Employee employee){
+
+    @GetMapping("/{id}")
+    public GeneriqueResponse<Page<EmployeeDto>> SearchById(@PathVariable("id") Long id ){
         try {
-            return new GeneriqueResponse<Employee>(messageSource.getMessage(MessageConstant.RESOURCE_CREATED_SUCCESS,null, Locale.FRENCH),
-                    employeeService.createEmployee(employee),
+            SearchEmployeeDto searchEmployeeDto=new SearchEmployeeDto(id,null,null,null);
+            Page<EmployeeDto> pageEmployee=employeeService.searchByCriteria(searchEmployeeDto);
+            Page<EmployeeDto> pageDtoEmployee=pageEmployee.map(entity->modelMapper.map(entity, EmployeeDto.class));
+            return new GeneriqueResponse<>(messageSource.getMessage(MessageConstant.RESOURCE_FOUND_SUCCESS,null, Locale.FRENCH),
+                    pageDtoEmployee,
                     null,
                     Boolean.TRUE,
                     HttpStatus.OK.value());
         } catch(Exception e){
-            return new GeneriqueResponse<Employee>(messageSource.getMessage(ErrorConstant.ERROR_RESOURCE_NOT_FOND,null, Locale.FRENCH),
+            System.out.println(e.getMessage());
+            return new GeneriqueResponse<>(messageSource.getMessage(ErrorConstant.ERROR_RESOURCE_NOT_FOND,null, Locale.FRENCH),
                     null,
                     null,
                     Boolean.FALSE,
                     HttpStatus.NOT_FOUND.value());
         }
+
     }
+
 
     @PostMapping
     public GeneriqueResponse<Employee> createEmployee(@RequestBody Employee employee) {
@@ -92,38 +101,50 @@ public class EmployeeController {
                  HttpStatus.NOT_IMPLEMENTED.value());
         }
         }
+        @PutMapping("/{id}")
+        public GeneriqueResponse<EmployeeDto> updateEmployee( @PathVariable long id, @RequestBody EmployeeDto employeeDto){
+            System.out.println("id"+id);
+        try {
+            System.out.println("employeeDto = "+employeeDto);
 
-
-    @GetMapping("/Search")
-    public ResponseEntity<List<Employee>> searchEmployeesByCin(@RequestParam(value = "cin", required = false) String cin) {
-        List<Employee> employees;
-        // Add a check for "undefined" or other invalid strings
-        if (cin == null || cin.isEmpty() || "undefined".equals(cin)) {
-            employees = employeeService.getAllEmployees();
-        } else {
-            employees = employeeService.searchEmployeesByCin(cin);
+            return new GeneriqueResponse<>(messageSource.getMessage(MessageConstant.RESOURCE_UPDATE_SUCCESS,null,Locale.FRENCH),employeeService.updateEmployee(id,employeeDto),null,Boolean.TRUE,HttpStatus.OK.value());
+        }catch (Exception e){
+            System.out.println("error is"+ e);
+            return new GeneriqueResponse<>(messageSource.getMessage(ErrorConstant.ERROR_RESOURCE_NOT_UPDATED,null,Locale.FRENCH),null,null,Boolean.FALSE,HttpStatus.NOT_IMPLEMENTED.value());
         }
-        return ResponseEntity.ok(employees);
-    }
-
-//    // Add this method to return an employee by their ID
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Employee> getEmployeeById(@PathVariable("id") Long id) {
-//        Employee employee = employeeService.getEmployeeById(id);
-//        if (employee != null) {
-//            return ResponseEntity.ok(employee);
+        }
+//
+//    @GetMapping("/Search")
+//    public ResponseEntity<List<Employee>> searchEmployeesByCin(@RequestParam(value = "cin", required = false) String cin) {
+//        List<Employee> employees;
+//        // Add a check for "undefined" or other invalid strings
+//        if (cin == null || cin.isEmpty() || "undefined".equals(cin)) {
+//            employees = employeeService.getAllEmployees();
 //        } else {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+//            employees = employeeService.searchEmployeesByCin(cin);
 //        }
+//        return ResponseEntity.ok(employees);
 //    }
+//
+////    // Add this method to return an employee by their ID
+////    @GetMapping("/{id}")
+////    public ResponseEntity<Employee> getEmployeeById(@PathVariable("id") Long id) {
+////        Employee employee = employeeService.getEmployeeById(id);
+////        if (employee != null) {
+////            return ResponseEntity.ok(employee);
+////        } else {
+////            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+////        }
+////    }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmployee(@PathVariable("id") Long id) {
-        boolean isRemoved = employeeService.deleteEmployee(id);
-        if (isRemoved) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    @DeleteMapping
+    public GeneriqueResponse<Boolean> deleteEmployee(@PathVariable Long id){
+        try {
+            employeeService.deleteEmployee(Long.valueOf(id));
+            return new GeneriqueResponse<>(messageSource.getMessage(MessageConstant.RESOURCE_DELETED_SUCCESS, null, Locale.FRENCH), Boolean.TRUE, null, Boolean.TRUE, HttpStatus.OK.value());
+        } catch (Exception e) {
+            return new GeneriqueResponse<>(messageSource.getMessage(ErrorConstant.ERROR_RESOURCE_NOT_DELETED,
+                    null, Locale.FRENCH), null, null, Boolean.FALSE, HttpStatus.NO_CONTENT.value());
         }
     }
 }

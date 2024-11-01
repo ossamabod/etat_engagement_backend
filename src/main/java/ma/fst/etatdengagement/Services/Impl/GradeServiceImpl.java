@@ -1,17 +1,14 @@
 package ma.fst.etatdengagement.Services.Impl;
 
 import ma.fst.etatdengagement.Adapter.GradeAdapter;
-import ma.fst.etatdengagement.DTO.Employee.EmployeeDto;
 import ma.fst.etatdengagement.DTO.Grade.GradeDto;
 import ma.fst.etatdengagement.DTO.Grade.SearchGradeDto;
-import ma.fst.etatdengagement.Models.Employee;
 import ma.fst.etatdengagement.Models.Grade;
 import ma.fst.etatdengagement.Repository.GradeRepository;
 import ma.fst.etatdengagement.Repository.IndemnitesRepository;
 import ma.fst.etatdengagement.Repository.RetenueRepository;
 import ma.fst.etatdengagement.Services.GradeService;
 import ma.fst.etatdengagement.Specification.GradeSpecification;
-import ma.fst.etatdengagement.tools.Constant.Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,11 +35,7 @@ public class GradeServiceImpl implements GradeService {
         this.gradeAdapter = gradeAdapter;
     }
 
-    @Override
-    public Page<Grade> getAllGrades() {
-        Pageable pageable= PageRequest.of(1,8);
-        return gradeRepository.findAll(pageable);
-    }
+
     @Override
     public List<GradeDto> searchByCriteria(SearchGradeDto searchGradeDto){
 
@@ -54,10 +47,6 @@ public class GradeServiceImpl implements GradeService {
         return gradeList.stream().map(gradeAdapter::fromGradeToGradeDto).collect(Collectors.toList());
     };
 
-    @Override
-    public Optional<Grade> getGradeById(Long id) {
-        return gradeRepository.findById(id);
-    }
 
     @Override
     public Grade createGradeWithDetails(Grade grade) {
@@ -75,9 +64,8 @@ public class GradeServiceImpl implements GradeService {
 
         return gradeRepository.save(grade);
     }
-
     @Override
-    public Optional<Grade> updateGradeWithDetails(Long id, Grade grade) {
+    public Optional<Grade> updateGradeWithDetails(long id, Grade grade) {
         return gradeRepository.findById(id).map(existingGrade -> {
             existingGrade.setCode(grade.getCode());
             existingGrade.setLibelle(grade.getLibelle());
