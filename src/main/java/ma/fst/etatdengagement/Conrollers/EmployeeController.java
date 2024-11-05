@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @Data
@@ -102,7 +103,7 @@ public class EmployeeController {
         }
         }
         @PutMapping("/{id}")
-        public GeneriqueResponse<EmployeeDto> updateEmployee( @PathVariable long id, @RequestBody EmployeeDto employeeDto){
+        public GeneriqueResponse<Optional<EmployeeDto>> updateEmployee(@PathVariable long id, @RequestBody EmployeeDto employeeDto){
             System.out.println("id"+id);
         try {
             System.out.println("employeeDto = "+employeeDto);

@@ -89,7 +89,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new IllegalArgumentException("Employee cannot be null.");
         }
 
-//         Set the employee reference in conjoint if it exists
         if (employee.getConjoint() != null) {
             employee.getConjoint().setEmployee(employee);  // This is important to set the reference back to employee
             System.out.println("conjoint added succecfuly");
@@ -176,13 +175,50 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
     @Override
-    public EmployeeDto updateEmployee( long id,EmployeeDto employeeDto) {
-        if (!employeeRepository.existsById(id)) {
-            throw new IllegalArgumentException("Employee with ID " + employeeDto.employeeId() + " not found.");
-        }
-        Employee updatedEmployee = modelMapper.map(employeeDto,Employee.class);
-//        updatedEmployee.setEmployeeId(id);
-        return employeeAdapter.fromEmployeeToEmployeeDTO(this.createEmployee(updatedEmployee));
+    public Optional<EmployeeDto> updateEmployee(long id, EmployeeDto employeeDto) {
+        return employeeRepository.findById(id).map(existingEmployee -> {
+            // Use ModelMapper to update most fields in one go
+            modelMapper.map(employeeDto, existingEmployee);
+
+            // Handle Grade update separately
+            if (employeeDto.grade() != null && employeeDto.grade().id() != null) {
+                Grade grade = gradeRepository.findById(employeeDto.grade().id())
+                        .orElseThrow(() -> new IllegalArgumentException("Grade not found"));
+                existingEmployee.setGrade(grade);
+            }
+
+            // Update or create Conjoint
+            if (employeeDto.conjoint() != null) {
+                Conjoint conjoint = Optional.ofNullable(existingEmployee.getConjoint()).orElse(new Conjoint());
+                modelMapper.map(employeeDto.conjoint(), conjoint);
+                conjoint.setEmployee(existingEmployee);
+                existingEmployee.setConjoint(conjoint);
+            }
+
+            // Update Enfants list
+            if (employeeDto.enfants() != null) {
+                existingEmployee.getEnfants().clear();
+                employeeDto.enfants().forEach(enfantDto -> {
+                    Enfant enfant = modelMapper.map(enfantDto, Enfant.class);
+                    enfant.setEmployee(existingEmployee);
+                    existingEmployee.getEnfants().add(enfant);
+                });
+            }
+
+            // Update EtatEngagement list
+            if (employeeDto.EtatEngagement() != null) {
+                existingEmployee.getEtatEngagement().clear();
+                employeeDto.EtatEngagement().forEach(etatEngagementDto -> {
+                    EtatEngagement etatEngagement = modelMapper.map(etatEngagementDto, EtatEngagement.class);
+                    etatEngagement.setEmployee(existingEmployee);
+                    existingEmployee.getEtatEngagement().add(etatEngagement);
+                });
+            }
+
+            // Save and return updated employee
+            Employee savedEmployee = employeeRepository.save(existingEmployee);
+            return employeeAdapter.fromEmployeeToEmployeeDTO(savedEmployee);
+        });
     }
 
     // 5. Search employees by CIN
