@@ -40,9 +40,9 @@ public class EmployeeController {
         this.modelMapper=modelMapper;
 
     }
-    @GetMapping("/searchbycriteria")
+    @PostMapping("/searchbycriteria")
     @ResponseBody
-    public GeneriqueResponse<Page<EmployeeDto>> SearchByCriteria(SearchEmployeeDto searchEmployeeDto){
+    public GeneriqueResponse<Page<EmployeeDto>> SearchByCriteria(@RequestBody SearchEmployeeDto searchEmployeeDto){
         try {
             Page<EmployeeDto> pageEmployee=employeeService.searchByCriteria(searchEmployeeDto);
             Page<EmployeeDto> pageDtoEmployee=pageEmployee.map(entity->modelMapper.map(entity, EmployeeDto.class));
