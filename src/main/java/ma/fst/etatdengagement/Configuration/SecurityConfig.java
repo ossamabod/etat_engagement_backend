@@ -3,8 +3,6 @@
 //import lombok.RequiredArgsConstructor;
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.context.annotation.Configuration;
-//import org.springframework.security.authentication.AuthenticationManager;
-//import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 //import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 //import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 //import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,14 +24,18 @@
 //        http
 //                .csrf(AbstractHttpConfigurer::disable)
 //                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/swagger-ui/**").permitAll()
+//                        .requestMatchers("/v3/api-docs/**").permitAll()
 //                        .anyRequest().authenticated())
-//                .sessionManagement(sessionManagement -> sessionManagement
-//                        .sessionCreationPolicy(STATELESS));
-//        return http.build();
-//    }
+//                .oauth2ResourceServer(oauth2 -> oauth2
+//                        .jwt(jwt -> jwt
+//                                .jwtAuthenticationConverter(jwtAuthConverter)
+//                        ))
+//                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(STATELESS));
 //
-//    @Bean
-//    public AuthenticationManager authenticationManagerBean(HttpSecurity http) throws Exception {
-//        return http.getSharedObject(AuthenticationManagerBuilder.class).build();
+//
+//
+//
+//        return http.build();
 //    }
 //}

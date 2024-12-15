@@ -1,5 +1,6 @@
 package ma.fst.etatdengagement.Services.Impl;
 
+import lombok.AllArgsConstructor;
 import ma.fst.etatdengagement.Adapter.EmployeeAdapter;
 import ma.fst.etatdengagement.DTO.Employee.EmployeeDto;
 import ma.fst.etatdengagement.DTO.Employee.SearchEmployeeDto;
@@ -40,7 +41,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private GradeService gradeService;
     private final EmployeeSpecification employeeSpecification;
     private final EmployeeAdapter employeeAdapter;
-    @Autowired
+
     public EmployeeServiceImpl(MessageSource messageSource, ModelMapper modelMapper, EmployeRepository employeeRepository, EtatEngagementRepository etatEngagementRepository, GradeRepository gradeRepository, EmployeeSpecification employeeSpecification, EmployeeAdapter employeeAdapter) {
         this.messageSource = messageSource;
         this.modelMapper = modelMapper;
@@ -48,7 +49,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         this.etatEngagementRepository = etatEngagementRepository;
         this.gradeRepository = gradeRepository;
         this.employeeSpecification=employeeSpecification;
-
         this.employeeAdapter = employeeAdapter;
     }
     @Override

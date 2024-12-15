@@ -1,0 +1,26 @@
+server:
+  servlet:
+    context-path:
+
+spring:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/Etat_Engagement
+    username: root
+    password:
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://ssodev.irat.ma:8080/realms/gestion_materiel
+#          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+#jwt:
+#  auth:
+#    converter:
+#      principle-attribute: preferred_username

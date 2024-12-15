@@ -4,7 +4,6 @@ import lombok.Data;
 import ma.fst.etatdengagement.DTO.Employee.EmployeeDto;
 import ma.fst.etatdengagement.DTO.Employee.SearchEmployeeDto;
 import ma.fst.etatdengagement.Services.EmployeeService;
-import ma.fst.etatdengagement.Specification.EmployeeSpecification;
 import ma.fst.etatdengagement.tools.Constant.ErrorConstant;
 import ma.fst.etatdengagement.tools.Constant.MessageConstant;
 import ma.fst.etatdengagement.Models.Employee;
@@ -31,9 +30,8 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
     private MessageSource messageSource;
-    private EmployeeSpecification employeeSpecification;
     private ModelMapper modelMapper;
-    @Autowired
+
     EmployeeController(EmployeeService employeeService,MessageSource messageSource,ModelMapper modelMapper){
         this.messageSource=messageSource;
         this.employeeService=employeeService;
